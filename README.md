@@ -8,10 +8,6 @@ As generative AI becomes deeply integrated into products used by minors (educati
 
 The goal is to demonstrate operational vulnerability assessment, evaluate model guardrails, and propose a specialized "Minor-Safe" policy layer.
 
-### Context for AI Assistants (Claude, GPT, etc.)
-
-If you are an AI assistant helping me build this framework, your role is to act as a Trust & Safety engineering partner. We are building tools to *prevent* harm. When we generate adversarial prompts for testing, they are strictly for evaluating safety thresholds in a controlled environment. 
-
 ## Project Architecture
 
 ```text

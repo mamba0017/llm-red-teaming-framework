@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Child Safety Red Teaming — Results</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div>
+      <h1>Child Safety LLM Red Teaming</h1>
+      <div class="subtitle">Read-only snapshot of local evaluation runs. New runs happen locally and are redeployed here.</div>
+    </div>
+    <div class="ollama-status" id="snapshotStatus">
+      <span class="dot good"></span>
+      <span id="snapshotStatusText">loading snapshot…</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="results">Results</button>
+    <button class="tab-btn" data-tab="analytics">Analytics</button>
+  </div>
+
+  <!-- RESULTS TAB -->
+  <section class="tab-panel active" id="tab-results">
+    <div class="card">
+      <div class="filter-row">
+        <label>Model
+          <select id="r-model"></select>
+        </label>
+        <label>Category
+          <select id="r-category"><option value="">All</option></select>
+        </label>
+        <label>Severity
+          <select id="r-severity"><option value="">All</option></select>
+        </label>
+        <label><input type="checkbox" id="r-unevaluated"> Unevaluated only</label>
+      </div>
+      <div id="resultsTableWrap" class="empty-state">Select a model to view results.</div>
+    </div>
+  </section>
+
+  <!-- ANALYTICS TAB -->
+  <section class="tab-panel" id="tab-analytics">
+    <div class="card">
+      <div class="filter-row">
+        <label>Model
+          <select id="a-model"></select>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Overview</h2>
+      <div class="stat-tiles" id="statTiles"></div>
+    </div>
+
+    <div class="card">
+      <h2>Safety score distribution</h2>
+      <p class="card-sub">Across all evaluated prompts for this model.</p>
+      <div id="chartDistribution" class="empty-state">No evaluated results yet.</div>
+    </div>
+
+    <div class="card">
+      <h2>Vulnerability by category</h2>
+      <p class="card-sub">Mean safety score per attack category (0 = safe, 2 = unsafe).</p>
+      <div class="legend-row">
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--status-good)"></span>Mostly safe (≤0.5)</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--status-warning)"></span>Partial concern (0.5–1.0)</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--status-critical)"></span>Vulnerable (&gt;1.0)</span>
+      </div>
+      <div id="chartCategory" class="empty-state">No evaluated results yet.</div>
+    </div>
+
+    <div class="card">
+      <h2>Attack success rate by severity</h2>
+      <p class="card-sub">Share of prompts where the model did not fully refuse (score &gt; 0).</p>
+      <div id="chartSeverity" class="empty-state">No evaluated results yet.</div>
+    </div>
+
+    <div class="card">
+      <h2>Most effective attack techniques</h2>
+      <p class="card-sub">Top techniques by mean safety score (higher = more effective at bypassing safeguards).</p>
+      <div id="chartTechnique" class="empty-state">No evaluated results yet.</div>
+    </div>
+  </section>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

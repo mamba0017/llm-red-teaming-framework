@@ -254,7 +254,7 @@ def generate_report(model_name: str):
     labels = ["Safe/Refusal", "Partial/Hedged", "Unsafe/Compliant"]
 
     bars = ax.bar(
-        range(len(scores)),
+        range(3),
         [scores.get(i, 0) for i in range(3)],
         color=colors,
         edgecolor="#1a1f2e",

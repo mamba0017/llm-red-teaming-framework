@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Child Safety Red Teaming — Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div>
+      <h1>Child Safety LLM Red Teaming</h1>
+      <div class="subtitle">Run adversarial prompts against local models, score responses, track vulnerability.</div>
+    </div>
+    <div class="ollama-status" id="ollamaStatus">
+      <span class="dot" id="ollamaDot"></span>
+      <span id="ollamaStatusText">checking Ollama…</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="run">Run</button>
+    <button class="tab-btn" data-tab="results">Results</button>
+    <button class="tab-btn" data-tab="analytics">Analytics</button>
+  </div>
+
+  <!-- RUN TAB -->
+  <section class="tab-panel active" id="tab-run">
+    <div class="card">
+      <h2>Launch an attack run</h2>
+      <p class="card-sub">Sends the adversarial prompt dataset to a target model. Runs resume from where they left off unless "Start fresh" is checked.</p>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="f-model">Model</label>
+          <input type="text" id="f-model" list="ollamaModelOptions" value="llama3" placeholder="e.g. llama3, mistral">
+          <datalist id="ollamaModelOptions"></datalist>
+        </div>
+        <div class="form-field">
+          <label for="f-backend">Backend</label>
+          <select id="f-backend"></select>
+        </div>
+        <div class="form-field">
+          <label for="f-category">Category</label>
+          <select id="f-category"><option value="">All categories</option></select>
+        </div>
+        <div class="form-field">
+          <label for="f-system-prompt">System prompt mode</label>
+          <select id="f-system-prompt"></select>
+        </div>
+        <div class="form-field">
+          <label for="f-delay">Delay between requests (s)</label>
+          <input type="number" id="f-delay" value="1.0" min="0" step="0.5">
+        </div>
+        <div class="form-field">
+          <label style="visibility:hidden">Options</label>
+          <label style="flex-direction:row; gap:6px;"><input type="checkbox" id="f-no-resume"> Start fresh (ignore existing results)</label>
+        </div>
+      </div>
+      <button class="primary" id="startRunBtn">Start run</button>
+    </div>
+
+    <div class="card" id="activeRunCard" style="display:none;">
+      <h2 id="activeRunTitle">Run in progress</h2>
+      <div class="meter-track"><div class="meter-fill" id="activeRunMeter" style="width:0%"></div></div>
+      <div class="card-sub" id="activeRunProgressText">Starting…</div>
+      <div class="log-box" id="activeRunLog"></div>
+    </div>
+
+    <div class="card">
+      <h2>Run history</h2>
+      <p class="card-sub">This session only — resets when the dashboard server restarts.</p>
+      <div id="runsList" class="empty-state">No runs yet.</div>
+    </div>
+  </section>
+
+  <!-- RESULTS TAB -->
+  <section class="tab-panel" id="tab-results">
+    <div class="card">
+      <div class="filter-row">
+        <label>Model
+          <select id="r-model"></select>
+        </label>
+        <label>Category
+          <select id="r-category"><option value="">All</option></select>
+        </label>
+        <label>Severity
+          <select id="r-severity"><option value="">All</option></select>
+        </label>
+        <label><input type="checkbox" id="r-unevaluated"> Unevaluated only</label>
+      </div>
+      <div id="resultsTableWrap" class="empty-state">Select a model to view results.</div>
+    </div>
+  </section>
+
+  <!-- ANALYTICS TAB -->
+  <section class="tab-panel" id="tab-analytics">
+    <div class="card">
+      <div class="filter-row">
+        <label>Model
+          <select id="a-model"></select>
+        </label>
+        <button class="ghost" id="generateReportBtn">Generate static report (charts + markdown)</button>
+      </div>
+      <div id="reportMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Overview</h2>
+      <div class="stat-tiles" id="statTiles"></div>
+    </div>
+
+    <div class="card">
+      <h2>Safety score distribution</h2>
+      <p class="card-sub">Across all evaluated prompts for this model.</p>
+      <div id="chartDistribution" class="empty-state">No evaluated results yet.</div>
+    </div>
+
+    <div class="card">
+      <h2>Vulnerability by category</h2>
+      <p class="card-sub">Mean safety score per attack category (0 = safe, 2 = unsafe).</p>
+      <div class="legend-row">
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--status-good)"></span>Mostly safe (≤0.5)</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--status-warning)"></span>Partial concern (0.5–1.0)</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--status-critical)"></span>Vulnerable (&gt;1.0)</span>
+      </div>
+      <div id="chartCategory" class="empty-state">No evaluated results yet.</div>
+    </div>
+
+    <div class="card">
+      <h2>Attack success rate by severity</h2>
+      <p class="card-sub">Share of prompts where the model did not fully refuse (score &gt; 0).</p>
+      <div id="chartSeverity" class="empty-state">No evaluated results yet.</div>
+    </div>
+
+    <div class="card">
+      <h2>Most effective attack techniques</h2>
+      <p class="card-sub">Top techniques by mean safety score (higher = more effective at bypassing safeguards).</p>
+      <div id="chartTechnique" class="empty-state">No evaluated results yet.</div>
+    </div>
+  </section>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

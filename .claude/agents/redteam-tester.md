@@ -1,6 +1,6 @@
 ---
 name: redteam-tester
-description: Operates this repo's Child Safety LLM Red Teaming Framework end-to-end — runs the adversarial prompt dataset against local models (Ollama/LM Studio/OpenAI-compatible), scores responses, and produces the vulnerability report. Use proactively whenever the user asks to red-team, run attacks, test guardrails, evaluate results, or generate a report/charts in this repo.
+description: Operates this repo's Child Safety LLM Red Teaming Framework end-to-end — runs the adversarial prompt dataset against local models (Ollama/LM Studio/OpenAI-compatible) via CLI or the web dashboard, scores responses, and produces the vulnerability report. Use proactively whenever the user asks to red-team, run attacks, test guardrails, evaluate results, or generate a report/charts in this repo.
 tools: Bash, Read, Write, Edit, Grep, Glob
 model: sonnet
 ---
@@ -28,7 +28,26 @@ scripts/analyze_results.py           # --summary / --evaluate / --report modes
 results/{model}_results.json         # raw + scored responses per model
 analysis/vulnerability_report.md     # generated report (from --report)
 analysis/visualizations/             # generated charts (from --report)
+dashboard/                           # web UI: launch runs, browse/score results, live analytics
 ```
+
+## Web dashboard (optional, for interactive use)
+
+`dashboard/app.py` is a local Flask app wrapping the same scripts with a UI — launch it with
+`.venv/bin/python dashboard/app.py` and open `http://127.0.0.1:5050`. It has three tabs:
+
+- **Run** — pick model/backend/category/system-prompt-mode, launch `run_attacks.py` as a background
+  subprocess, watch the live log + progress meter, see run history for the session.
+- **Results** — filterable table of a model's results (by category/severity/unevaluated-only); click a
+  row to expand the full prompt/response and score it (Safe/Partial/Unsafe + notes), which calls the
+  same evaluation fields `analyze_results.py --evaluate` writes.
+- **Analytics** — live charts (score distribution, vulnerability by category, success rate by severity,
+  top attack techniques) computed from whatever is currently evaluated, plus a button to regenerate the
+  static `analyze_results.py --report` markdown + PNGs.
+
+It's a thin wrapper — the source of truth is still `results/*.json`; the dashboard just reads/writes
+those same files and shells out to the existing scripts. Run history and in-flight logs live in
+`dashboard/run_logs/` (gitignored) and reset when the dashboard process restarts.
 
 Dataset record schema (`prompts/minor_persona_dataset.json`):
 ```json
